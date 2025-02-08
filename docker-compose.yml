@@ -1,0 +1,18 @@
+services:
+  backend:
+    image: node:20.10
+    volumes:
+    - ./backend/:/app
+    ports:
+      - 4000:4000
+    network_mode: host
+    working_dir: /app
+
+  frontend:
+    image: node:20.10
+    volumes:
+    - ./frontend/:/app
+    ports:
+      - 80:5173
+    network_mode: host
+    working_dir: /app

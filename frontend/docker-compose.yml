@@ -1,9 +1,0 @@
-services:
-  server:
-    image: node:20.10
-    volumes:
-    - .:/app
-    ports:
-      - 5173:5173
-    network_mode: host
-    working_dir: /app
