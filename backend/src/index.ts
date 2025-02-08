@@ -46,7 +46,7 @@ io.on("connection", async (socket) => {
 
         socket.emit('call', currentCall);
 
-        await delay(3000);
+        await delay(7000);
     }
   }, 1000)
 

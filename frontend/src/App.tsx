@@ -4,11 +4,15 @@ import { socketClient } from './utils/socket-client'
 
 interface Call {
   password?: string,
-  window?: string
+  window?: string,
+  time?: Date
 }
+
 function App() {
   const [call, setCall] = useState<Call|undefined>();
   const [history, setHistory] = useState<Call[]>([]);
+  const [isEnlarged, setIsEnlarged] = useState(false);
+  const [isBlinking, setIsBlinking] = useState(false);
 
   useEffect(() => {
     if (!call) {
@@ -18,10 +22,21 @@ function App() {
     setHistory(prev => {
       const newHistory = [...prev];
 
-      newHistory.unshift(call);
+      newHistory.unshift({
+        ...call,
+        time: new Date()
+      });
 
       return newHistory
     });
+
+    setIsEnlarged(true);
+    setIsBlinking(true);
+    setTimeout(() => {
+      setIsEnlarged(false);
+
+      setIsBlinking(false);
+    }, 5000)
   }, [call])
 
   useEffect(() => {
@@ -34,28 +49,28 @@ function App() {
   return (
     <>
       <div className="main-wrapper">
-        <div className="history-wrapper">
-          <h4>CHAMADA ATUAL</h4>
+        <div className="calls-wrapper">
+          <h4>ÚLTIMA SENHA</h4>
 
-          <div className="current-call ">
+          <div className={`current-call`}>
             <div className="p-5">
-              <h5>SENHA</h5><br/>
-              <b>{call?.password ?? '-'}</b>
+              <span className="call-title">SENHA</span><br/>
+              <b className={`call-description  ${isEnlarged ? 'enlarged' : ''} ${isBlinking ? 'blinking' : ''}`}>{call?.password ?? '-'}</b>
             </div>
 
             <div className="mt-4 p-5">
-              <h5>GUICHÊ</h5><br/>
-              <b>{call?.window ?? '-'}</b>
+              <span className="call-title">GUICHÊ</span><br/>
+              <b className={`call-description  ${isEnlarged ? 'enlarged' : ''} ${isBlinking ? 'blinking' : ''}`}>{call?.window ?? '-'}</b>
             </div>
           </div>
 
         </div>
 
-        <div className="calls-wrapper">
-          <h4>Últimos chamados</h4>
-          <ul className="list">
+        <div className="history-wrapper">
+          <h4>Histórico</h4>
+          <ul className="list-group list-group-flush bg-transparent">
             {history.map(item => {
-              return <li>{item.password} - {item.window}</li>
+              return <li className="list-group-item bg-transparent text-white py-5">Senha: {item.password} - Guichê {item.window}<br/>{item.time?.toLocaleTimeString('pt-BR')}</li>
             })}
 
           </ul>
