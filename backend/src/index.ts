@@ -29,6 +29,14 @@ io.on("connection", (socket) => {
     io.emit("message", msg); // Envia a mensagem para todos os clientes
   });
 
+  setTimeout(() => {
+
+    socket.emit('call', {
+        password: '911',
+        window: '7'
+      })
+  }, 1000)
+
   socket.on("disconnect", () => {
     console.log(`Usuário desconectado: ${socket.id}`);
   });

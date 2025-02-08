@@ -1,37 +1,47 @@
 import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import { socketClient } from './utils/socket-client'
 
+interface Call {
+  password?: string,
+  window?: string
+}
 function App() {
-  const [count, setCount] = useState(0)
+  const [call, setCall] = useState<Call|undefined>();
+
+
   useEffect(() => {
-    socketClient.emit('teste');
+    socketClient.on('call', (call: Call) => {
+      setCall(call);
+    })
   }, []);
+
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="main-wrapper">
+        <div className="history-wrapper">
+          <h4>CHAMADA ATUAL</h4>
+
+          <div className="current-call ">
+            <div className="p-5">
+              <h5>SENHA</h5><br/>
+              <b>{call?.password ?? '-'}</b>
+            </div>
+
+            <div className="mt-4 p-5">
+              <h5>GUICHÊ</h5><br/>
+              <b>{call?.window ?? '-'}</b>
+            </div>
+          </div>
+
+        </div>
+
+        <div className="calls-wrapper">
+          <h4>Últimos chamados</h4>
+        </div>
+
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
