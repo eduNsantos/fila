@@ -20,8 +20,13 @@ app.get("/", (req, res) => {
   res.send("Servidor Express com Socket.IO rodando!");
 });
 
+const delay = (ms: number) => {
+    return new Promise(resolve => {
+        setTimeout(() => resolve(true), ms);
+    })
+}
 // Evento de conexão do Socket.IO
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
   console.log(`Usuário conectado: ${socket.id}`);
 
   socket.on("message", (msg) => {
@@ -29,12 +34,20 @@ io.on("connection", (socket) => {
     io.emit("message", msg); // Envia a mensagem para todos os clientes
   });
 
-  setTimeout(() => {
+  const calls = [
+    { password: 'A01', window: '2' },
+    { password: 'P01', window: '3' },
+    { password: 'A02', window: '2' }
+  ];
 
-    socket.emit('call', {
-        password: '911',
-        window: '7'
-      })
+  setTimeout(async () => {
+    for (let i = 0; i < calls.length; i++) {
+        let currentCall = calls[i];
+
+        socket.emit('call', currentCall);
+
+        await delay(3000);
+    }
   }, 1000)
 
   socket.on("disconnect", () => {

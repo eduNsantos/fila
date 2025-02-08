@@ -8,7 +8,21 @@ interface Call {
 }
 function App() {
   const [call, setCall] = useState<Call|undefined>();
+  const [history, setHistory] = useState<Call[]>([]);
 
+  useEffect(() => {
+    if (!call) {
+      return;
+    }
+
+    setHistory(prev => {
+      const newHistory = [...prev];
+
+      newHistory.unshift(call);
+
+      return newHistory
+    });
+  }, [call])
 
   useEffect(() => {
     socketClient.on('call', (call: Call) => {
@@ -39,6 +53,12 @@ function App() {
 
         <div className="calls-wrapper">
           <h4>Últimos chamados</h4>
+          <ul className="list">
+            {history.map(item => {
+              return <li>{item.password} - {item.window}</li>
+            })}
+
+          </ul>
         </div>
 
       </div>
