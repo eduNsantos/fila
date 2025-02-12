@@ -2,17 +2,22 @@ services:
   backend:
     image: node:20.10
     volumes:
-    - ./backend/:/app
+      - ./backend/:/app
     ports:
       - 4000:4000
-    network_mode: host
+    # network_mode: host
     working_dir: /app
+    command: "npm run dev"
 
   frontend:
     image: node:20.10
     volumes:
-    - ./frontend/:/app
+      - ./frontend/:/app
     ports:
       - 80:5173
-    network_mode: host
     working_dir: /app
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    command: ["redis-server", "--appendonly", "yes"]

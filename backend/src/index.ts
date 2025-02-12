@@ -2,6 +2,8 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
+import { redisClient } from "./utils/redisClient";
+import { userInfo } from "os";
 
 const app = express();
 const httpServer = createServer(app);
@@ -20,6 +22,96 @@ app.get("/", (req, res) => {
   res.send("Servidor Express com Socket.IO rodando!");
 });
 
+
+app.post('/queue/generate-password', async (req, res) => {
+  const { type } = req.body;
+
+  if (!type) {
+    res.status(400).json({
+      message: 'type not defined'
+    })
+    return;
+  }
+
+  if (!['preferential', 'normal'].includes(type)) {
+
+    res.status(400).json({
+      message: 'type is not valid'
+    })
+    return;
+  }
+
+  const prefix = type == 'preferential' ? 'P' : 'N';
+  let password;
+  let final;
+
+  let lastFoundPassword = await redisClient.get(`password:last:${type}`);
+
+  if (!lastFoundPassword) {
+    await redisClient.set(`password:last:${type}`, '1');
+
+    password = 1;
+  } else {
+    password = parseInt(lastFoundPassword);
+    password++;
+  }
+
+  final = `${prefix}${String(password)?.padStart(3, '0')}`;
+
+  await redisClient.set(`password:last:${type}`, `${password}`);
+
+  await redisClient.rpush('password:queue', `${final}`)
+
+  console.log(`Final ${prefix}${String(password)?.padStart(3, '0')}`);
+
+  res.json({
+    password: final
+  });
+})
+
+app.get('/queue/clear', async (req, res) => {
+  await redisClient.del('password:queue');
+  await redisClient.del('password:last:preferential');
+  await redisClient.del('password:last:normal');
+
+  res.send('ok');
+})
+
+
+app.get('/queue/get-next', async (req, res) => {
+  const queue = await redisClient.lpop('password:queue');
+
+  if (!queue) {
+    res.status(400).json({
+      message: 'EMPTY_QUEUE'
+    });
+
+    return;
+  }
+
+  const finalQueueJSON = { password: queue, window: '2', date: new Date() };
+
+  await redisClient.lpush('password:history', JSON.stringify(finalQueueJSON));
+
+  io.emit('call', finalQueueJSON);
+
+  res.json({
+    queue: queue
+  });
+})
+
+
+app.get('/queue/history', async (req, res) => {
+  const history = await redisClient.lrange('password:history', 0, -1);
+
+  let jsons = [];
+  for (let row of history) {
+    jsons.push(JSON.parse(row))
+  }
+
+  res.json(jsons);
+});
+
 const delay = (ms: number) => {
     return new Promise(resolve => {
         setTimeout(() => resolve(true), ms);
@@ -34,27 +126,30 @@ io.on("connection", async (socket) => {
     io.emit("message", msg); // Envia a mensagem para todos os clientes
   });
 
-  const calls = [
-    { password: 'A01', window: '2' },
-    { password: 'P01', window: '3' },
-    { password: 'A02', window: '2' }
-  ];
+  // const calls = [
+  //   { password: 'A01', window: '2' },
+  //   { password: 'P01', window: '3' },
+  //   { password: 'A02', window: '2' }
+  // ];
 
-  setTimeout(async () => {
-    for (let i = 0; i < calls.length; i++) {
-        let currentCall = calls[i];
+  // setTimeout(async () => {
+  //   for (let i = 0; i < calls.length; i++) {
+  //       let currentCall = calls[i];
 
-        socket.emit('call', currentCall);
+  //       socket.emit('call', currentCall);
 
-        await delay(7000);
-    }
-  }, 1000)
+  //       await delay(15000);
+  //   }
+  // }, 1000)
 
   socket.on("disconnect", () => {
     console.log(`Usuário desconectado: ${socket.id}`);
   });
 });
 
+
+
+redisClient;
 // Inicia o servidor
 const PORT = 4000;
 httpServer.listen(PORT, () => {
