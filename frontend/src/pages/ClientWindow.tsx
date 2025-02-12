@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import '../assets/css/ClientWindow.css'
 import { socketClient } from '../utils/socket-client'
+import api from '../utils/api';
 
 interface Call {
   password?: string,
   window?: string,
-  time?: Date
+  date: string
 }
 
 function ClientWindow() {
@@ -41,9 +42,13 @@ function ClientWindow() {
 
     if (history.length > 0) {
       const totalTime = history.reduce((sum, currentCall) => {
-        if (currentCall.time && callWithTime.time) {
-          return sum + (callWithTime.time.valueOf() - currentCall.time.valueOf());
+        if (currentCall.date && callWithTime.date) {
+          const incomingDate = new Date(callWithTime.date);
+          const currentCallDate = new Date(currentCall.date);
+
+          return sum + (incomingDate.valueOf() - currentCallDate.valueOf());
         }
+
         return sum;
       }, 0);
 
@@ -66,6 +71,25 @@ function ClientWindow() {
     })
   }, []);
 
+  const [fetched, setFetched] = useState(false);
+
+  useEffect(() => {
+    if (fetched) return;
+
+    setFetched(true);
+
+    async function fetchDataList() {
+      const response = await api.get('/queue/history');
+
+      setHistory(response.data);
+    }
+
+    fetchDataList();
+
+  }, []);
+
+
+  // if (history.length == 0) return;
 
   return (
     <>
@@ -94,7 +118,7 @@ function ClientWindow() {
               </span>
 
               <span>
-                <b className={`additional-info-description`}>Último atendimento: {history?.[0]?.time?.toLocaleTimeString('pt-BR') ?? '-'}</b>
+                <b className={`additional-info-description`}>Último atendimento: {history?.[0]?.date ? new Date(history?.[0]?.date)?.toLocaleTimeString('pt-BR') : '-'}</b>
               </span>
             </div>
 
@@ -106,7 +130,7 @@ function ClientWindow() {
           <h4>Histórico</h4>
           <ul className="list-group list-group-flush bg-transparent">
             {history.map(item => {
-              return <li className="list-group-item bg-transparent text-white py-5">Senha: {item.password} - Guichê {item.window}<br/>{item.time?.toLocaleTimeString('pt-BR')}</li>
+              return <li key={item.password} className="list-group-item bg-transparent text-white py-5">Senha: {item.password} - Guichê {item.window}<br/>{item?.date ? new Date(item?.date)?.toLocaleTimeString('pt-BR') : '-'}</li>
             })}
 
           </ul>

@@ -78,7 +78,7 @@ app.get('/queue/clear', async (req, res) => {
 })
 
 
-app.get('/queue/get-next', async (req, res) => {
+app.get('/queue/call-next', async (req, res) => {
   const queue = await redisClient.lpop('password:queue');
 
   if (!queue) {
@@ -101,6 +101,13 @@ app.get('/queue/get-next', async (req, res) => {
 })
 
 
+app.get('/queue/', async (req, res) => {
+  const queues = await redisClient.lrange('password:queue', 0, -1);
+
+  res.json(queues);
+});
+
+
 app.get('/queue/history', async (req, res) => {
   const history = await redisClient.lrange('password:history', 0, -1);
 
@@ -117,30 +124,14 @@ const delay = (ms: number) => {
         setTimeout(() => resolve(true), ms);
     })
 }
-// Evento de conexão do Socket.IO
+
 io.on("connection", async (socket) => {
   console.log(`Usuário conectado: ${socket.id}`);
 
   socket.on("message", (msg) => {
     console.log(`Mensagem recebida: ${msg}`);
-    io.emit("message", msg); // Envia a mensagem para todos os clientes
+    io.emit("message", msg);
   });
-
-  // const calls = [
-  //   { password: 'A01', window: '2' },
-  //   { password: 'P01', window: '3' },
-  //   { password: 'A02', window: '2' }
-  // ];
-
-  // setTimeout(async () => {
-  //   for (let i = 0; i < calls.length; i++) {
-  //       let currentCall = calls[i];
-
-  //       socket.emit('call', currentCall);
-
-  //       await delay(15000);
-  //   }
-  // }, 1000)
 
   socket.on("disconnect", () => {
     console.log(`Usuário desconectado: ${socket.id}`);
