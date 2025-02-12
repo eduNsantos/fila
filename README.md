@@ -1,5 +1,7 @@
 ### Guichê
 
+Sistema feito para controle e chamadas de senhas em tempo real
+
 #### Primeiros passos:
 
 1. Instalar as dependências do frontend
