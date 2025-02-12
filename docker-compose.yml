@@ -16,6 +16,7 @@ services:
     ports:
       - 80:5173
     working_dir: /app
+    command: "npm run dev"
 
   redis:
     image: redis:latest
