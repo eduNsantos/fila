@@ -60,9 +60,21 @@ app.post('/queue/generate-password', async (req, res) => {
 
   await redisClient.set(`password:last:${type}`, `${password}`);
 
-  await redisClient.rpush('password:queue', `${final}`)
+  const finalJSON = {
+    password: final,
+    window: null,
+    generateAt: new Date(),
+    date: null
+  }
+
+  await redisClient.rpush('password:queue', `${JSON.stringify(finalJSON)}`)
 
   console.log(`Final ${prefix}${String(password)?.padStart(3, '0')}`);
+
+  io.emit(`queue`, {
+    type: 'new',
+    queue: finalJSON
+  })
 
   res.json({
     password: final
@@ -71,6 +83,7 @@ app.post('/queue/generate-password', async (req, res) => {
 
 app.get('/queue/clear', async (req, res) => {
   await redisClient.del('password:queue');
+  await redisClient.del('password:history');
   await redisClient.del('password:last:preferential');
   await redisClient.del('password:last:normal');
 
@@ -89,14 +102,16 @@ app.get('/queue/call-next', async (req, res) => {
     return;
   }
 
-  const finalQueueJSON = { password: queue, window: '2', date: new Date() };
+  const finalQueueJSON = JSON.parse(queue);
+
+  finalQueueJSON.date = new Date();
 
   await redisClient.lpush('password:history', JSON.stringify(finalQueueJSON));
 
   io.emit('call', finalQueueJSON);
 
   res.json({
-    queue: queue
+    queue: finalQueueJSON
   });
 })
 
@@ -104,7 +119,12 @@ app.get('/queue/call-next', async (req, res) => {
 app.get('/queue/', async (req, res) => {
   const queues = await redisClient.lrange('password:queue', 0, -1);
 
-  res.json(queues);
+  let jsons = [];
+  for (let row of queues) {
+    jsons.push(JSON.parse(row))
+  }
+
+  res.json(jsons);
 });
 
 
