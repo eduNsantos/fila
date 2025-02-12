@@ -100,8 +100,6 @@ function ClientWindow() {
         api.get('/queue'),
         api.get('/queue/history')
       ])
-      // console.log(responseHistory.data);
-
 
       setCall(responseHistory.data[0]);
 
