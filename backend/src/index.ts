@@ -17,11 +17,17 @@ const io = new Server(httpServer, {
 app.use(cors());
 app.use(express.json());
 
-// Rota de teste
-app.get("/", (req, res) => {
-  res.send("Servidor Express com Socket.IO rodando!");
-});
 
+
+app.get('/window', async (req, res) => {
+
+  const windows = await redisClient.smembers('window');
+
+  res.json({
+    windows
+  })
+
+})
 
 app.post('/queue/generate-password', async (req, res) => {
   const { type } = req.body;
@@ -81,17 +87,26 @@ app.post('/queue/generate-password', async (req, res) => {
   });
 })
 
-app.get('/queue/clear', async (req, res) => {
+app.post('/queue/clear', async (req, res) => {
   await redisClient.del('password:queue');
   await redisClient.del('password:history');
   await redisClient.del('password:last:preferential');
   await redisClient.del('password:last:normal');
+  await redisClient.del('window');
 
   res.send('ok');
 })
 
 
-app.get('/queue/call-next', async (req, res) => {
+app.post('/queue/call-next', async (req, res) => {
+  const { window } = req.body;
+
+  if (!window) {
+    res.status(400).json({
+      message: 'WINDOW_NOT_DEFINED'
+    });
+  }
+
   const queue = await redisClient.lpop('password:queue');
 
   if (!queue) {
@@ -103,6 +118,8 @@ app.get('/queue/call-next', async (req, res) => {
   }
 
   const finalQueueJSON = JSON.parse(queue);
+
+  finalQueueJSON.window = window;
 
   finalQueueJSON.date = new Date();
 
@@ -148,13 +165,54 @@ const delay = (ms: number) => {
 io.on("connection", async (socket) => {
   console.log(`Usuário conectado: ${socket.id}`);
 
-  socket.on("message", (msg) => {
-    console.log(`Mensagem recebida: ${msg}`);
-    io.emit("message", msg);
-  });
 
-  socket.on("disconnect", () => {
+  socket.on('joinWindows', async (windowNumber: string) => {
+    if (windowNumber.trim() == '') {
+      await redisClient.srem('window', socket.data);
+      return;
+    }
+
+
+    let newSocketData = JSON.stringify({
+      window: windowNumber,
+      socketId: socket.id
+    });
+
+    const windows = await redisClient.smembers('window');
+
+    let isWindowNumberTanken = false;
+    for (let window of windows) {
+      let windowJSON = JSON.parse(window);
+
+      if (windowJSON.window === windowNumber) {
+        isWindowNumberTanken = true;
+
+        socket.emit('windowJoinError', 'WINDOW_ALREADY_TAKEN')
+        return;
+      }
+    }
+
+    await redisClient.srem('window', socket.data);
+
+    const exists = await redisClient.sismember('window', newSocketData);
+
+    if (!exists) {
+      await redisClient.sadd('window', newSocketData);
+    }
+
+    socket.data = newSocketData;
+
+    socket.emit('window', {
+      type: 'new',
+      window: windowNumber
+    })
+
+  })
+
+  socket.on("disconnect", async () => {
     console.log(`Usuário desconectado: ${socket.id}`);
+
+    await redisClient.srem('window', socket.data);
   });
 });
 

@@ -6,6 +6,9 @@ export const redisClient = new Redis({
   // password: "sua_senha", // Descomente se precisar de autenticação
 });
 
-redisClient.on("connect", () => console.log("✅ Conectado ao Redis"));
+redisClient.on("connect", async () => {
+  console.log("✅ Conectado ao Redis")
+  await redisClient.del('window');
+});
 redisClient.on("error", (err) => console.error("❌ Erro no Redis:", err));
 
