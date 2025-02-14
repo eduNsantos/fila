@@ -5,7 +5,6 @@ services:
       - ./backend/:/app
     ports:
       - 4000:4000
-    # network_mode: host
     working_dir: /app
     command: "npm run dev"
 

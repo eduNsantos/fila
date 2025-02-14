@@ -143,20 +143,20 @@ function ClientWindow() {
           </div>
 
           <div className="additional-info">
-            <h5>INFORMAÇÕES IMPORTANTES</h5>
+            <div className="separator"/>
 
-            <div className="d-flex justify-content-between col-10 mx-auto">
-              <span className='border-end px-3'>
+            <div className="d-flex justify-content-between col-12 mx-auto">
+              <div className='border-end px-3 col-4'>
                 <b className={`additional-info-description`}><b>TEMPO MÉDIO CHAMADA</b><br/>{(avgCallingTime).toFixed(2)}min</b>
-              </span>
+              </div>
 
-              <span className='border-end px-3'>
+              <div className='border-end px-3 col-4'>
                 <b className={`additional-info-description`}><b>ÚLTIMA CHAMADA</b><br/>{history?.[0]?.date ? new Date(history?.[0]?.date)?.toLocaleTimeString('pt-BR') : '-'}</b>
-              </span>
+              </div>
 
-              <span>
+              <div className="col-4">
                 <b className={`additional-info-description`}><b>SENHAS PENDENTES</b><br/>{queue.length}</b>
-              </span>
+              </div>
             </div>
 
           </div>

@@ -63,7 +63,7 @@
   bottom: 5%;
 }
 
-.calls-wrapper .additional-info h5 {
+.calls-wrapper .additional-info .separator {
   font-size: 2rem;
   font-weight: bolder;
   border-top: 1px solid rgb(148, 148, 148);
