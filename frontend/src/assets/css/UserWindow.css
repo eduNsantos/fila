@@ -9,8 +9,7 @@ body {
 }
 
 .container {
-  width: 90%;
-  max-width: 600px;
+  width: 80vw;
 }
 
 .user-window {
@@ -23,6 +22,9 @@ body {
 
 .title {
   font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 20px;
 }
 
@@ -48,10 +50,13 @@ body {
 }
 
 .window-input {
-  padding: 10px;
+  padding: 0px;
   font-size: 16px;
-  width: 100%;
+  width: 10%;
+  margin-left: 20px;
+  text-align: center;
   border-radius: 6px;
+  display: inline;
   border: none;
   outline: none;
 }
@@ -71,7 +76,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #2a2a2a;
+  background: #e7e7e7;
   padding: 15px;
   border-radius: 6px;
   margin-bottom: 10px;
@@ -85,7 +90,7 @@ body {
 
 .queue-item .time {
   font-size: 14px;
-  color: #bbb;
+  color: #353535;
 }
 
 .next-password {

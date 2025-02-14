@@ -55,3 +55,100 @@ body {
   max-height: 100%;
   overflow-y: scroll;
 }
+
+
+.main-wrapper {
+
+  padding: 1rem 0rem;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+  height: 100vh;
+  width: 100vw;
+}
+
+.calls-wrapper {
+
+  display: flex;
+  /* align-items: ; */
+  justify-content: center;
+  text-align: center;
+  color: white;
+  position: relative;
+  width: 70%;
+  float: left;
+  height: 100%;
+  top: 0;
+  padding: 2rem 1rem;
+  border-right: 1px solid rgb(148, 148, 148);
+}
+
+.calls-wrapper h4, .history-wrapper h4 {
+  font-size: 3.5rem;
+  font-weight: bolder;
+  border-bottom: 1px solid rgb(148, 148, 148);
+  padding-bottom: 2rem;
+  height: fit-content;
+  width: 100%;
+}
+
+.calls-wrapper .additional-info {
+  width: 100%;
+  padding: 2rem 1rem;
+  position: absolute;
+  bottom: 5%;
+}
+
+.calls-wrapper .additional-info .separator {
+  font-size: 2rem;
+  font-weight: bolder;
+  border-top: 1px solid rgb(148, 148, 148);
+  padding: 2rem 0;
+  height: fit-content;
+  width: 100%;
+}
+
+.additional-info-description {
+  font-size: 1.3rem;
+  display: inline;
+}
+
+.current-call {
+  position: absolute;
+  top: 20%;
+}
+
+
+.call-title {
+  font-size: 3rem;
+  font-weight: bolder;
+}
+
+.call-description {
+  margin-top: 5rem;
+  font-size: 2rem;
+
+  transition: 0.5s ease-in-out;
+}
+
+.call-description.enlarged {
+  font-size: 3rem;
+  transition: 0.5s ease-in-out;
+}
+
+.call-description.blinking {
+  animation: blink 1s infinite;
+}
+
+.history-wrapper {
+  text-align: center;
+  color: white;
+  width: 30%;
+  float: right;
+  height: 70%;
+  padding: 2rem 1rem;
+}
+
+.history-wrapper {
+  font-size: 1.5rem;
+}

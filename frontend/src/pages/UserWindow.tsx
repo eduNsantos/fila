@@ -93,23 +93,30 @@ function UserWindow() {
     return (
         <div className="container">
             <div className="user-window">
-                <h1 className="title">📢 Chamar Próxima Senha</h1>
 
-                <button disabled={disabled} onClick={callNewPassword} className="btn btn-primary btn-lg">
-                    🔔 Chamar Próxima Senha
-                </button>
-
-                <div className="window-section">
+                {/* <div className="window-section">
                     <p className="current-window">
                         <strong>Guichê Atual:</strong> {window ?? '-'}
                     </p>
+                </div> */}
+
+                <h1 className="title">
+                    📢 <b>GUICHÊ USUARIO</b>
+
                     <input
                         className="form-control window-input"
                         placeholder="Digite o número do guichê"
                         onChange={handleWindowChange}
                         value={windowInput}
                     />
-                </div>
+                </h1>
+
+
+
+                <button disabled={disabled} onClick={callNewPassword} className="btn btn-primary btn-lg">
+                    🔔 Chamar Próxima Senha
+                </button>
+
 
                 <h3 className="queue-title">📋 Próximas Senhas</h3>
                 <ul className="list-group queue-list">
@@ -122,8 +129,9 @@ function UserWindow() {
                                 className={`list-group-item queue-item ${index === 0 ? 'next-password' : ''}`}
                             >
                                 <div>
-                                    <span className="password-number">{row.password}</span>
-                                    <small className="time">{new Date(row.generateAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</small>
+                                    <span className="password-number">{row.password} {row.password?.charAt(0) == 'P' ? `⚠️`  : ''}</span>
+                                    <small className="time ms-3">{new Date(row.generateAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</small>
+
                                 </div>
 
                                 {index === 0 && <span className="badge bg-success">🔜 Próxima Senha</span>}
