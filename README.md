@@ -1,5 +1,7 @@
 ### Guichê
 
+![image](https://github.com/user-attachments/assets/cd04904f-2e13-465f-91bd-22c03dfb1791)
+
 Sistema feito para controle e chamadas de senhas em tempo real
 
 #### Primeiros passos:
